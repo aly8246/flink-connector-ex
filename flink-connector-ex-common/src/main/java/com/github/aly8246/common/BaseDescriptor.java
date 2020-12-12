@@ -21,16 +21,29 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
     //默认为同步
     public static final Boolean ASYNC_SUPPORT_VALUE_DEFAULT = false;
 
-    //一次性加载的多少个数据
-    public static final String SOURCE_FETCH_SIZE = "source.fetch-size";
-    public static final Integer SOURCE_FETCH_SIZE_DEFAULT = 5000;
 
     //累计缓存多少行后写入db
     public static final String WRITE_FLUSH_MAX_ROWS = "sink.buffer-flush.max-rows";
     //累计多少秒后写入db
     public static final String WRITE_FLUSH_INTERVAL = "sink.buffer-flush.interval";
-    //累计重试次数
+
+    //source参数
+    //读取出错后的重试次数
+    public static final String SOURCE_MAX_RETRIES = "source.max-retries";
+    public static final Long SOURCE_MAX_RETRIES_DEFAULT = 3L;
+    //最多缓存多少行数据
+    public static final String SOURCE_CACHE_ROWS = "source.cache.rows";
+    public static final Long SOURCE_CACHE_ROWS_DEFAULT = 10000L;
+    //缓存最长时间
+    public static final String SOURCE_CACHE_TTL = "source.cache.ttl";
+    public static final Long SOURCE_CACHE_TTL_DEFAULT = 1000L * 30;
+    //做为stream加载表的时候一次fetch多少条数据
+    public static final String SOURCE_FETCH_SIZE = "source.fetch-size";
+    public static final Long SOURCE_FETCH_SIZE_DEFAULT = 10000L;
+
+    //写入累计重试次数
     public static final String WRITE_MAX_RETRIES = "sink.max-retries";
+
 
     //schema
     public static final String CONNECTOR_SCHEMA_DATA_TYPE = SCHEMA + ".#." + SCHEMA_DATA_TYPE;
@@ -65,13 +78,16 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
         //异步支持
         supportedList.add(ASYNC_SUPPORT_KEY);
 
-        //buffer支持
+        //sink buffer支持
         supportedList.add(WRITE_FLUSH_MAX_ROWS);
         supportedList.add(WRITE_FLUSH_INTERVAL);
         supportedList.add(WRITE_MAX_RETRIES);
 
         //source参数支持
         supportedList.add(SOURCE_FETCH_SIZE);
+        supportedList.add(SOURCE_MAX_RETRIES);
+        supportedList.add(SOURCE_CACHE_ROWS);
+        supportedList.add(SOURCE_CACHE_TTL);
 
         //表字段支持
         supportedList.add(CONNECTOR_SCHEMA_DATA_TYPE);
@@ -126,5 +142,15 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
             }
             Preconditions.checkArgument(maxRetries == 0, "sink.max-retries必须大于1");
         });
+    }
+
+    /**
+     * 连表配置选项验证
+     */
+    protected void validateLookupProperties(DescriptorProperties properties) {
+        properties.validateLong(SOURCE_FETCH_SIZE, true);
+        properties.validateLong(SOURCE_MAX_RETRIES, true);
+        properties.validateDuration(SOURCE_CACHE_TTL, true, 1);
+        properties.validateInt(SOURCE_CACHE_ROWS, true);
     }
 }

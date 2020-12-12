@@ -1,6 +1,5 @@
 package com.github.aly8246.format.input;
 
-import com.github.aly8246.dialect.JdbcDialect;
 import com.github.aly8246.option.JdbcOption;
 import com.github.aly8246.option.JdbcSourceSinkContext;
 import org.apache.flink.api.common.functions.RuntimeContext;
@@ -129,7 +128,6 @@ public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements
     @Override
     public void setRuntimeContext(RuntimeContext t) {
         super.setRuntimeContext(t);
-
         //提取sql
         ConditionResolver conditionResolver = new ConditionResolver(t.getTaskNameWithSubtasks());
         //提取条件语句
@@ -137,12 +135,9 @@ public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements
         //提取要查询的字段
         String[] selectFields = conditionResolver.extractSelectFields();
 
-        //获取表名称
-        String tableName = this.context.getOption().getTable();
-        //获取数据库方言
-        JdbcDialect jdbcDialect = this.context.getOption().getJdbcDialect();
         //创建select的sql语句
-        String selectFromStatement = jdbcDialect.getSelectFromStatement(tableName, selectFields, new String[0]);
+        String selectFromStatement = this.context.selectStatement(selectFields);
+
         //拼接where条件，得到sql
         this.sourceSql = selectFromStatement + conditionSql;
     }
@@ -153,13 +148,13 @@ public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements
      */
     @Override
     public void openInputFormat() {
-        this.openConnection();
+        this.connection = this.context.openConnection();
         try {
             //预编译stmt
             this.preparedStatement = this.connection.prepareStatement(this.sourceSql);
 
             //设置stmt一次fetch多少
-            this.preparedStatement.setFetchSize(this.context.getOption().getFetchSize());
+            this.preparedStatement.setFetchSize(this.context.getOption().getFetchSize().intValue());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -183,27 +178,6 @@ public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-        }
-    }
-
-    /**
-     * 打开数据库连接
-     */
-    private void openConnection() {
-        JdbcOption option = this.context.getOption();
-        try {
-            //和数据库建立连接
-            Class.forName(option.getJdbcDriver());
-            if (option.getUsername() != null) {
-                this.connection = DriverManager.getConnection(option.getUrl());
-            } else {
-                this.connection = DriverManager.getConnection(option.getUrl(), option.getUsername(), option.getPassword());
-            }
-
-            //自动提交
-            this.connection.setAutoCommit(true);
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
         }
     }
 }

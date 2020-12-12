@@ -48,7 +48,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      */
     @Override
     public TableFunction<Row> getLookupFunction(String[] lookupKeys) {
-        return null;
+        return new JdbcSyncTableFunction(this.context,lookupKeys);
     }
 
     /**

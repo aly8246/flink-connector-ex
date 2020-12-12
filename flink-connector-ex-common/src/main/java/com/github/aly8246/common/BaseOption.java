@@ -15,7 +15,11 @@ public class BaseOption implements Serializable {
     protected String password;
 
     //一次加载多少数据
-    private Integer fetchSize;
+    private final Long fetchSize;
+    //最多缓存多少行数据
+    private final Long cacheRows;
+    //最多缓存多少秒数据
+    private final Long cacheTtl;
 
     /**
      * 从配置文件创建
@@ -24,7 +28,9 @@ public class BaseOption implements Serializable {
      */
     public BaseOption(DescriptorProperties descriptorProperties) {
         descriptorProperties.getOptionalBoolean(ASYNC_SUPPORT_KEY).ifPresent(this::setAsyncSupported);
-        this.fetchSize = descriptorProperties.getOptionalInt(SOURCE_FETCH_SIZE).orElse(SOURCE_FETCH_SIZE_DEFAULT);
+        this.fetchSize = descriptorProperties.getOptionalLong(SOURCE_FETCH_SIZE).orElse(SOURCE_FETCH_SIZE_DEFAULT);
+        this.cacheRows = descriptorProperties.getOptionalLong(SOURCE_CACHE_ROWS).orElse(SOURCE_CACHE_ROWS_DEFAULT);
+        this.cacheTtl = descriptorProperties.getOptionalLong(SOURCE_CACHE_TTL).orElse(SOURCE_CACHE_TTL_DEFAULT);
         //简单匹配一个密码
         descriptorProperties
                 .asMap()
@@ -36,17 +42,27 @@ public class BaseOption implements Serializable {
                 .ifPresent(this::setPassword);
     }
 
-    public Integer getFetchSize() {
+    public Long getFetchSize() {
         return fetchSize;
     }
 
-    protected void setAsyncSupported(boolean asyncSupported) {
-        this.asyncSupported = asyncSupported;
+    public Long getCacheRows() {
+        return cacheRows;
+    }
+
+    public Long getCacheTtl() {
+        return cacheTtl;
     }
 
     public String getPassword() {
         return password;
     }
+
+
+    protected void setAsyncSupported(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
+    }
+
 
     protected void setPassword(String password) {
         this.password = password;

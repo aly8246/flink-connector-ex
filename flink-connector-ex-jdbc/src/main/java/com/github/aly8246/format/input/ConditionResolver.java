@@ -14,6 +14,9 @@ public class ConditionResolver {
         Matcher matcher = Pattern.compile(whereConditionRegex).matcher(tempString);
         if (matcher.find()) {
             tempString = matcher.group();
+        } else {
+            //如果没找到where，则证明是无where的语句
+            return "";
         }
         tempString = tempString.replace("[", "");
         tempString = tempString.replace("]", "");
@@ -22,7 +25,7 @@ public class ConditionResolver {
         tempString = tempString.replaceAll(":.*\\(\\d+\\)", "");
         tempString = tempString.replaceAll("CHARACTER SET \"UTF-16LE\"", "");
         tempString = tempString.replaceAll("where=", "where ");
-        return " "+tempString;
+        return " " + tempString;
     }
 
     public String[] extractSelectFields() {
@@ -30,6 +33,8 @@ public class ConditionResolver {
         Matcher matcher = Pattern.compile(selectFieldsRegex).matcher(tempString);
         if (matcher.find()) {
             tempString = matcher.group();
+        } else {
+            return new String[0];
         }
         tempString = tempString.replace("fields=", "");
         tempString = tempString.replace("[", "");
