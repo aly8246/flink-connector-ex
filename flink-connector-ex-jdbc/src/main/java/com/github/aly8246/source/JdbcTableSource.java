@@ -12,7 +12,6 @@ import org.apache.flink.table.sources.ProjectableTableSource;
 import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.sources.TableSource;
 import org.apache.flink.table.types.DataType;
-import org.apache.flink.table.types.utils.TypeConversions;
 import org.apache.flink.table.utils.TableConnectorUtils;
 import org.apache.flink.types.Row;
 
@@ -20,7 +19,6 @@ import java.util.stream.IntStream;
 
 public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTableSource<Row>, LookupableTableSource<Row> {
     private final JdbcSourceSinkContext context;
-    private final int[] selectFields;
     private final TableSchema tableSchema;
 
     /**
@@ -31,8 +29,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      */
     public JdbcTableSource(JdbcSourceSinkContext context, int[] selectFields) {
         this.context = context;
-        this.tableSchema = context.getTableSchema();
-        this.selectFields = selectFields;
+        this.tableSchema = context.getSelectFieldsTableSchema(selectFields);
     }
 
     /**
@@ -100,7 +97,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
     @Override
     public DataStream<Row> getDataStream(StreamExecutionEnvironment streamExecutionEnvironment) {
         return streamExecutionEnvironment
-                .createInput(new JdbcInputFormat(this.context), this.context.getTableSchema().toRowType())
+                .createInput(new JdbcInputFormat(this.context), this.tableSchema.toRowType())
                 .name(explainSource());
     }
 
@@ -109,7 +106,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      */
     @Override
     public TableSchema getTableSchema() {
-        return this.context.getTableSchema();
+        return this.tableSchema;
     }
 
     /**

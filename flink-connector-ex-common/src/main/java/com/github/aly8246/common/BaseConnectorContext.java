@@ -1,7 +1,5 @@
 package com.github.aly8246.common;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.types.DataType;
@@ -13,19 +11,13 @@ import java.util.Map;
 import static org.apache.flink.table.descriptors.Schema.SCHEMA;
 
 public class BaseConnectorContext<T extends BaseOption> implements Serializable {
-    //开启异步表支持
-    private boolean asyncSupported;
-
-    //开启动态表支持
-    private boolean dynamicSupported;
-
     //配置选项
-    private T option;
+    private final T option;
 
     /**
      * 原始配置文件
      */
-    private Map<String, String> properties;
+    private final Map<String, String> properties;
 
 
     /**
@@ -76,19 +68,12 @@ public class BaseConnectorContext<T extends BaseOption> implements Serializable 
         return this.option.asyncSupported;
     }
 
-    //是否是动态表
-    public boolean isDynamicSupported() {
-        return this.option.dynamicSupported;
-    }
-
-
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-
     public BaseConnectorContext(T option, Map<String, String> properties) {
         this.option = option;
         this.properties = properties;
+    }
+
+    public T getOption() {
+        return option;
     }
 }

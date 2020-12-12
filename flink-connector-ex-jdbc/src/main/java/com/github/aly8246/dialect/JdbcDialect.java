@@ -1,6 +1,5 @@
 package com.github.aly8246.dialect;
 
-import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.util.Preconditions;
 
 import java.io.Serializable;

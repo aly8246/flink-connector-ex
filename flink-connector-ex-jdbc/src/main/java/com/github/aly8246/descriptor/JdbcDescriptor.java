@@ -23,6 +23,9 @@ public class JdbcDescriptor extends BaseDescriptor {
     public static final String CONNECTOR_USERNAME = "jdbc.username";
     public static final String CONNECTOR_PASSWORD = "jdbc.password";
 
+    //source参数
+    public static final String SOURCE_FETCH_SIZE = "source.fetch-size";
+
     @Override
     public List<String> supportedProperties() {
         List<String> supportedProperties = super.supportedProperties();
@@ -32,6 +35,8 @@ public class JdbcDescriptor extends BaseDescriptor {
         supportedProperties.add(CONNECTOR_DRIVER);
         supportedProperties.add(CONNECTOR_USERNAME);
         supportedProperties.add(CONNECTOR_PASSWORD);
+
+        supportedProperties.add(SOURCE_FETCH_SIZE);
         return supportedProperties;
     }
 

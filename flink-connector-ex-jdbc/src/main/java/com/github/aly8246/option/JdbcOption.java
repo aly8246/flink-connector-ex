@@ -14,6 +14,9 @@ public class JdbcOption extends BaseOption {
     //数据库方言
     private JdbcDialect jdbcDialect;
 
+    //jdbc-url
+    private String url;
+
     //数据库表
     private String table;
 
@@ -35,13 +38,14 @@ public class JdbcOption extends BaseOption {
 
         descriptorProperties.getOptionalString(CONNECTOR_USERNAME).ifPresent(this::setUsername);
         descriptorProperties.getOptionalString(CONNECTOR_TABLE).ifPresent(this::setTable);
+        descriptorProperties.getOptionalString(CONNECTOR_URL).ifPresent(this::setUrl);
     }
 
     public JdbcDialect getJdbcDialect() {
         return jdbcDialect;
     }
 
-    public void setJdbcDialect(JdbcDialect jdbcDialect) {
+    private void setJdbcDialect(JdbcDialect jdbcDialect) {
         this.jdbcDialect = jdbcDialect;
     }
 
@@ -49,7 +53,23 @@ public class JdbcOption extends BaseOption {
         return username;
     }
 
-    public void setUsername(String username) {
+    public String getJdbcDriver() {
+        return jdbcDriver;
+    }
+
+    private void setJdbcDriver(String jdbcDriver) {
+        this.jdbcDriver = jdbcDriver;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    private void setUrl(String url) {
+        this.url = url;
+    }
+
+    private void setUsername(String username) {
         this.username = username;
     }
 
@@ -57,7 +77,7 @@ public class JdbcOption extends BaseOption {
         return table;
     }
 
-    public void setTable(String table) {
+    private void setTable(String table) {
         this.table = table;
     }
 }
