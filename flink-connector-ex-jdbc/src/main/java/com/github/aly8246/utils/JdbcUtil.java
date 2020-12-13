@@ -33,37 +33,41 @@ public class JdbcUtil implements Serializable {
     /**
      * 为stmt填充值
      */
-    public static void setFields(PreparedStatement statement, String[] lookupKeys, Object[] lookupValues, TableSchema schema) throws SQLException, ParseException {
+    public static void setFields(PreparedStatement statement, String[] lookupKeys, Object[] lookupValues, TableSchema schema) {
         for (int i = 0; i < lookupKeys.length; i++) {
             int stmtIndex = i + 1;
 
             DataType dataType = schema.getFieldDataType(lookupKeys[i]).get();
 
             LogicalType dataTypeLogicalType = dataType.getLogicalType();
-            if (dataTypeLogicalType instanceof BigIntType) {
-                statement.setLong(stmtIndex, Long.parseLong(lookupValues[i].toString()));
-            } else if (dataTypeLogicalType instanceof TinyIntType) {
-                statement.setInt(stmtIndex, Integer.parseInt(lookupKeys[i]));
-            } else if (dataTypeLogicalType instanceof IntType) {
-                statement.setInt(stmtIndex, Integer.parseInt(lookupKeys[i]));
-            } else if (dataTypeLogicalType instanceof BooleanType) {
-                statement.setBoolean(stmtIndex, Boolean.parseBoolean(lookupValues[i].toString()));
-            } else if (dataTypeLogicalType instanceof DecimalType) {
-                statement.setBigDecimal(stmtIndex, new BigDecimal(lookupKeys[i]));
-            } else if (dataTypeLogicalType instanceof DoubleType) {
-                statement.setDouble(stmtIndex, Double.parseDouble(lookupKeys[i]));
-            } else if (dataTypeLogicalType instanceof FloatType) {
-                statement.setFloat(stmtIndex, Float.parseFloat(lookupKeys[i]));
-            } else if (dataTypeLogicalType instanceof VarCharType) {
-                statement.setString(stmtIndex, lookupKeys[i]);
-            } else if (dataTypeLogicalType instanceof TimestampType) {
-                statement.setTimestamp(stmtIndex, new Timestamp(Long.parseLong(lookupValues[i].toString())));
-            } else if (dataTypeLogicalType instanceof DateType) {
-                java.util.Date sourceDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(lookupKeys[i]);
-                statement.setDate(stmtIndex, new Date(sourceDate.getTime()));
-            } else if (dataTypeLogicalType instanceof TimeType) {
-                java.util.Date sourceDate = new SimpleDateFormat("hh:mm:ss").parse(lookupKeys[i]);
-                statement.setTime(stmtIndex, new Time(sourceDate.getTime()));
+            try {
+                if (dataTypeLogicalType instanceof BigIntType) {
+                    statement.setLong(stmtIndex, Long.parseLong(lookupValues[i].toString()));
+                } else if (dataTypeLogicalType instanceof TinyIntType) {
+                    statement.setInt(stmtIndex, Integer.parseInt(lookupKeys[i]));
+                } else if (dataTypeLogicalType instanceof IntType) {
+                    statement.setInt(stmtIndex, Integer.parseInt(lookupKeys[i]));
+                } else if (dataTypeLogicalType instanceof BooleanType) {
+                    statement.setBoolean(stmtIndex, Boolean.parseBoolean(lookupValues[i].toString()));
+                } else if (dataTypeLogicalType instanceof DecimalType) {
+                    statement.setBigDecimal(stmtIndex, new BigDecimal(lookupKeys[i]));
+                } else if (dataTypeLogicalType instanceof DoubleType) {
+                    statement.setDouble(stmtIndex, Double.parseDouble(lookupKeys[i]));
+                } else if (dataTypeLogicalType instanceof FloatType) {
+                    statement.setFloat(stmtIndex, Float.parseFloat(lookupKeys[i]));
+                } else if (dataTypeLogicalType instanceof VarCharType) {
+                    statement.setString(stmtIndex, lookupKeys[i]);
+                } else if (dataTypeLogicalType instanceof TimestampType) {
+                    statement.setTimestamp(stmtIndex, new Timestamp(Long.parseLong(lookupValues[i].toString())));
+                } else if (dataTypeLogicalType instanceof DateType) {
+                    java.util.Date sourceDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(lookupKeys[i]);
+                    statement.setDate(stmtIndex, new Date(sourceDate.getTime()));
+                } else if (dataTypeLogicalType instanceof TimeType) {
+                    java.util.Date sourceDate = new SimpleDateFormat("hh:mm:ss").parse(lookupKeys[i]);
+                    statement.setTime(stmtIndex, new Time(sourceDate.getTime()));
+                }
+            } catch (SQLException | ParseException ex) {
+                ex.printStackTrace();
             }
         }
     }

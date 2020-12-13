@@ -1,6 +1,7 @@
 package com.github.aly8246.factory;
 
 import com.github.aly8246.descriptor.JdbcDescriptor;
+import com.github.aly8246.option.JdbcContext;
 import com.github.aly8246.option.JdbcOption;
 import com.github.aly8246.option.JdbcSourceSinkContext;
 import com.github.aly8246.source.JdbcTableSource;
@@ -35,7 +36,7 @@ public class JdbcExSourceSinkFactory implements StreamTableSourceFactory<Row>, S
         JdbcOption jdbcOption = new JdbcOption(descriptorProperties);
 
         //创建运行上下文对象
-        JdbcSourceSinkContext context = new JdbcSourceSinkContext(jdbcOption, map);
+        JdbcContext context = new JdbcSourceSinkContext(jdbcOption, map);
 
         //创建tableSource
         return new JdbcTableSource(context);

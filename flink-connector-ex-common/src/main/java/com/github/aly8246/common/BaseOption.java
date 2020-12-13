@@ -1,5 +1,6 @@
 package com.github.aly8246.common;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 
 import java.io.Serializable;
@@ -21,6 +22,9 @@ public class BaseOption implements Serializable {
     //最多缓存多少秒数据
     private final Long cacheTtl;
 
+    //查询超时或者错误后的重试次数
+    private final Long retry;
+
     /**
      * 从配置文件创建
      * 这里简单匹配一个密码，从配置文件中搜素带有password的配置来设置为密码
@@ -31,6 +35,7 @@ public class BaseOption implements Serializable {
         this.fetchSize = descriptorProperties.getOptionalLong(SOURCE_FETCH_SIZE).orElse(SOURCE_FETCH_SIZE_DEFAULT);
         this.cacheRows = descriptorProperties.getOptionalLong(SOURCE_CACHE_ROWS).orElse(SOURCE_CACHE_ROWS_DEFAULT);
         this.cacheTtl = descriptorProperties.getOptionalLong(SOURCE_CACHE_TTL).orElse(SOURCE_CACHE_TTL_DEFAULT);
+        this.retry = descriptorProperties.getOptionalLong(SOURCE_MAX_RETRIES).orElse(SOURCE_MAX_RETRIES_DEFAULT);
         //简单匹配一个密码
         descriptorProperties
                 .asMap()
@@ -42,12 +47,23 @@ public class BaseOption implements Serializable {
                 .ifPresent(this::setPassword);
     }
 
+    /**
+     * 是否包含密码
+     */
+    public boolean hasPassword() {
+        return this.password != null && !this.password.equals("");
+    }
+
     public Long getFetchSize() {
         return fetchSize;
     }
 
     public Long getCacheRows() {
         return cacheRows;
+    }
+
+    public Long getRetry() {
+        return retry;
     }
 
     public Long getCacheTtl() {

@@ -8,7 +8,7 @@ import org.apache.flink.types.Row
 /**
  * 流表同步join维表
  */
-object StreamTableSyncJoinDimTableApplication {
+object StreamTableASyncJoinDimTableApplication {
   def main(args: Array[String]): Unit = {
     val envTuple: (StreamExecutionEnvironment, StreamTableEnvironment) = EnvCreate.createEnv(args)
 
@@ -39,7 +39,7 @@ object StreamTableSyncJoinDimTableApplication {
         | )
         | with(
         | 'connector.type' = 'jdbc-ex',
-        | 'async-support' = 'false',
+        | 'async-support' = 'true',
         | 'jdbc.url' = 'jdbc:phoenix:hadoop1,hadoop2,hadoop3:2181',
         | 'jdbc.driver' = 'org.apache.phoenix.jdbc.PhoenixDriver',
         | 'jdbc.table' = 'dim_user'
@@ -59,7 +59,7 @@ object StreamTableSyncJoinDimTableApplication {
         |on si.user_id = du.id
         |""".stripMargin)
       .toRetractStream[Row]
-      .print("流表同步join维表")
+      .print("流表异步join维表")
 
     envTuple._1.execute()
   }

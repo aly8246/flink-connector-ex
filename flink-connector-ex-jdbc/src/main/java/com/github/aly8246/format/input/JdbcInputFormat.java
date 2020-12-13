@@ -1,7 +1,7 @@
 package com.github.aly8246.format.input;
 
-import com.github.aly8246.option.JdbcOption;
-import com.github.aly8246.option.JdbcSourceSinkContext;
+import com.github.aly8246.option.JdbcContext;
+import com.github.aly8246.option.JdbcOperation;
 import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.api.common.io.DefaultInputSplitAssigner;
 import org.apache.flink.api.common.io.RichInputFormat;
@@ -14,23 +14,28 @@ import org.apache.flink.core.io.InputSplit;
 import org.apache.flink.core.io.InputSplitAssigner;
 import org.apache.flink.types.Row;
 
-import java.sql.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * 从数据库读取数据
  */
 public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements ResultTypeQueryable<Row> {
-    private final JdbcSourceSinkContext context;
+    private final JdbcContext context;
 
     //完整的查询sql
     private String sourceSql;
 
     private volatile Boolean hasNext = true;
-    private transient Connection connection;
+    //private transient Connection connection;
     private transient PreparedStatement preparedStatement;
-    private transient ResultSet resultSet;
+    private transient Connection connection;
+    private ResultSet resultSet;
 
-    public JdbcInputFormat(JdbcSourceSinkContext context) {
+    public JdbcInputFormat(JdbcContext context) {
         this.context = context;
     }
 
@@ -136,7 +141,7 @@ public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements
         String[] selectFields = conditionResolver.extractSelectFields();
 
         //创建select的sql语句
-        String selectFromStatement = this.context.selectStatement(selectFields);
+        String selectFromStatement = this.context.getQueryStmt(selectFields);
 
         //拼接where条件，得到sql
         this.sourceSql = selectFromStatement + conditionSql;
@@ -148,7 +153,17 @@ public class JdbcInputFormat extends RichInputFormat<Row, InputSplit> implements
      */
     @Override
     public void openInputFormat() {
-        this.connection = this.context.openConnection();
+        JdbcOperation jdbcOperation = new JdbcOperation(this.context);
+
+        //创建数据库连接
+        DataSource dataSource = jdbcOperation.openSyncConnection();
+
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         try {
             //预编译stmt
             this.preparedStatement = this.connection.prepareStatement(this.sourceSql);

@@ -5,12 +5,11 @@ import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.utils.TableSchemaUtils;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import static org.apache.flink.table.descriptors.Schema.SCHEMA;
 
-public class BaseConnectorContext<T extends BaseOption> implements Serializable {
+public class BaseConnectorContext<T extends BaseOption> implements SourceSinkContext<T> {
     //配置选项
     private final T option;
 
@@ -18,6 +17,16 @@ public class BaseConnectorContext<T extends BaseOption> implements Serializable 
      * 原始配置文件
      */
     private final Map<String, String> properties;
+
+    @Override
+    public T getOption() {
+        return this.option;
+    }
+
+    @Override
+    public Map<String, String> getProperties() {
+        return this.properties;
+    }
 
 
     /**
@@ -27,11 +36,13 @@ public class BaseConnectorContext<T extends BaseOption> implements Serializable 
      *
      * @return TableSchema
      */
+    @Override
     public TableSchema getTableSchema() {
         final DescriptorProperties descriptorProperties = new DescriptorProperties(true);
         descriptorProperties.putProperties(this.properties);
         return TableSchemaUtils.getPhysicalSchema(descriptorProperties.getTableSchema(SCHEMA));
     }
+
 
     /**
      * 获取RowTypeInfo
@@ -40,6 +51,7 @@ public class BaseConnectorContext<T extends BaseOption> implements Serializable 
      *
      * @param selectFields 要查询的字段
      */
+    @Override
     public TableSchema getSelectFieldsTableSchema(int[] selectFields) {
         TableSchema sourceTableSchema = this.getTableSchema();
 
@@ -64,6 +76,7 @@ public class BaseConnectorContext<T extends BaseOption> implements Serializable 
     /**
      * 是否是异步表
      */
+    @Override
     public boolean isAsyncSupported() {
         return this.option.asyncSupported;
     }
@@ -71,9 +84,5 @@ public class BaseConnectorContext<T extends BaseOption> implements Serializable 
     public BaseConnectorContext(T option, Map<String, String> properties) {
         this.option = option;
         this.properties = properties;
-    }
-
-    public T getOption() {
-        return option;
     }
 }

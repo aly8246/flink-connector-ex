@@ -1,6 +1,7 @@
 package com.github.aly8246.source;
 
 import com.github.aly8246.format.input.JdbcInputFormat;
+import com.github.aly8246.option.JdbcContext;
 import com.github.aly8246.option.JdbcSourceSinkContext;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -18,7 +19,7 @@ import org.apache.flink.types.Row;
 import java.util.stream.IntStream;
 
 public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTableSource<Row>, LookupableTableSource<Row> {
-    private final JdbcSourceSinkContext context;
+    private final JdbcContext context;
     private final TableSchema tableSchema;
 
     /**
@@ -27,7 +28,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      * @param context      上下文对象
      * @param selectFields 要查询的字段下标
      */
-    public JdbcTableSource(JdbcSourceSinkContext context, int[] selectFields) {
+    public JdbcTableSource(JdbcContext context, int[] selectFields) {
         this.context = context;
         this.tableSchema = context.getSelectFieldsTableSchema(selectFields);
     }
@@ -37,7 +38,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      *
      * @param context 上下文对象
      */
-    public JdbcTableSource(JdbcSourceSinkContext context) {
+    public JdbcTableSource(JdbcContext context) {
         this(context, IntStream.range(0, context.getTableSchema().getFieldCount()).toArray());
     }
 
@@ -48,7 +49,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      */
     @Override
     public TableFunction<Row> getLookupFunction(String[] lookupKeys) {
-        return new JdbcSyncTableFunction(this.context,lookupKeys);
+        return new JdbcSyncTableFunction(this.context, lookupKeys);
     }
 
     /**
@@ -58,7 +59,7 @@ public class JdbcTableSource implements StreamTableSource<Row>, ProjectableTable
      */
     @Override
     public AsyncTableFunction<Row> getAsyncLookupFunction(String[] lookupKeys) {
-        return null;
+        return new JdbcAsyncTableFunction(this.context, lookupKeys);
     }
 
     /**

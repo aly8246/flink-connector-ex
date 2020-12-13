@@ -17,7 +17,7 @@
     </modules>
 
     <properties>
-        <reversion>1.10.0</reversion>
+        <reversion>1.0.0</reversion>
         <flink.version>1.10.0</flink.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -25,6 +25,8 @@
         <phoenix.version>5.0.0-HBase-2.0</phoenix.version>
         <hbase.version>2.1.0-cdh6.2.1</hbase.version>
         <hadoop.version>3.0.0-cdh6.2.1</hadoop.version>
+        <hikari.version>3.1.0</hikari.version>
+        <vert.x.version>4.0.0</vert.x.version>
     </properties>
 
     <dependencies>
@@ -56,17 +58,17 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-common</artifactId>
-                <version>${project.version}</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -90,6 +92,20 @@
                 <version>${hadoop.version}</version>
             </dependency>
             <!--hadoop-->
+
+
+            <!--vert.x-->
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-jdbc-client</artifactId>
+                <version>${vert.x.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-core</artifactId>
+                <version>${vert.x.version}</version>
+            </dependency>
+            <!--vert.x-->
 
             <!--inner-->
             <dependency>
