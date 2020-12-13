@@ -4,6 +4,7 @@ import com.github.aly8246.descriptor.JdbcDescriptor;
 import com.github.aly8246.option.JdbcContext;
 import com.github.aly8246.option.JdbcOption;
 import com.github.aly8246.option.JdbcSourceSinkContext;
+import com.github.aly8246.sink.JdbcUpsertTableSink;
 import com.github.aly8246.source.JdbcTableSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.descriptors.DescriptorProperties;
@@ -24,7 +25,16 @@ public class JdbcExSourceSinkFactory implements StreamTableSourceFactory<Row>, S
 
     @Override
     public StreamTableSink<Tuple2<Boolean, Row>> createStreamTableSink(Map<String, String> map) {
-        return null;
+        //验证配置文件
+        DescriptorProperties descriptorProperties = jdbcDescriptor.validatedProperties(map);
+
+        //读取配置文件
+        JdbcOption jdbcOption = new JdbcOption(descriptorProperties);
+
+        //创建运行上下文对象
+        JdbcContext context = new JdbcSourceSinkContext(jdbcOption, map);
+
+        return new JdbcUpsertTableSink(context);
     }
 
     @Override

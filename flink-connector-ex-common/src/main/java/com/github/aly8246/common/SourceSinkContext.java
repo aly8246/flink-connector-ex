@@ -35,4 +35,11 @@ public interface SourceSinkContext<T extends BaseOption> extends Serializable {
         return this.getOption().asyncSupported;
     }
 
+    /**
+     * 异步流超时时间 默认要比buffer时间长，否则buffer里还没flush到db，异步流就超时了
+     */
+    public default Long asyncStreamWaitTime() {
+        return this.getOption().getBufferMaxInterval() / 2 + this.getOption().getBufferMaxInterval();
+    }
+
 }

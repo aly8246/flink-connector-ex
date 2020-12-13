@@ -15,12 +15,17 @@ public class BaseOption implements Serializable {
     //密码
     protected String password;
 
+    //source
     //一次加载多少数据
     private final Long fetchSize;
     //最多缓存多少行数据
     private final Long cacheRows;
     //最多缓存多少秒数据
     private final Long cacheTtl;
+
+    //sink
+    private final Long bufferMaxRow;
+    private final Long bufferMaxInterval;
 
     //查询超时或者错误后的重试次数
     private final Long retry;
@@ -32,10 +37,16 @@ public class BaseOption implements Serializable {
      */
     public BaseOption(DescriptorProperties descriptorProperties) {
         descriptorProperties.getOptionalBoolean(ASYNC_SUPPORT_KEY).ifPresent(this::setAsyncSupported);
+        //source参数
         this.fetchSize = descriptorProperties.getOptionalLong(SOURCE_FETCH_SIZE).orElse(SOURCE_FETCH_SIZE_DEFAULT);
         this.cacheRows = descriptorProperties.getOptionalLong(SOURCE_CACHE_ROWS).orElse(SOURCE_CACHE_ROWS_DEFAULT);
         this.cacheTtl = descriptorProperties.getOptionalLong(SOURCE_CACHE_TTL).orElse(SOURCE_CACHE_TTL_DEFAULT);
         this.retry = descriptorProperties.getOptionalLong(SOURCE_MAX_RETRIES).orElse(SOURCE_MAX_RETRIES_DEFAULT);
+
+        //sink参数
+        this.bufferMaxRow = descriptorProperties.getOptionalLong(SOURCE_MAX_RETRIES).orElse(SOURCE_MAX_RETRIES_DEFAULT);
+        this.bufferMaxInterval = descriptorProperties.getOptionalLong(WRITE_FLUSH_INTERVAL).orElse(WRITE_FLUSH_INTERVAL_DEFAULT);
+
         //简单匹配一个密码
         descriptorProperties
                 .asMap()
@@ -64,6 +75,18 @@ public class BaseOption implements Serializable {
 
     public Long getRetry() {
         return retry;
+    }
+
+    public boolean isAsyncSupported() {
+        return asyncSupported;
+    }
+
+    public Long getBufferMaxRow() {
+        return bufferMaxRow;
+    }
+
+    public Long getBufferMaxInterval() {
+        return bufferMaxInterval;
     }
 
     public Long getCacheTtl() {

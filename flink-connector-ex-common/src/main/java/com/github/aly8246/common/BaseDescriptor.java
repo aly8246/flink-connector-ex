@@ -22,19 +22,21 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
     public static final Boolean ASYNC_SUPPORT_VALUE_DEFAULT = false;
 
 
-    //累计缓存多少行后写入db
+    //累计缓存多少行后写入db，默认一行就写入
     public static final String WRITE_FLUSH_MAX_ROWS = "sink.buffer-flush.max-rows";
-    //累计多少秒后写入db
+    public static final Long WRITE_FLUSH_MAX_ROWS_DEFAULT = 1L;
+    //累计多少秒后写入db,两秒后就写入
     public static final String WRITE_FLUSH_INTERVAL = "sink.buffer-flush.interval";
+    public static final Long WRITE_FLUSH_INTERVAL_DEFAULT = 1000L * 2;
 
     //source参数
     //读取出错后的重试次数
     public static final String SOURCE_MAX_RETRIES = "source.max-retries";
     public static final Long SOURCE_MAX_RETRIES_DEFAULT = 3L;
-    //最多缓存多少行数据
+    //最多缓存多少行数据,默认缓存20000行数据
     public static final String SOURCE_CACHE_ROWS = "source.cache.rows";
-    public static final Long SOURCE_CACHE_ROWS_DEFAULT = 10000L;
-    //缓存最长时间
+    public static final Long SOURCE_CACHE_ROWS_DEFAULT = 20000L;
+    //缓存最长时间，默认缓存30秒
     public static final String SOURCE_CACHE_TTL = "source.cache.ttl";
     public static final Long SOURCE_CACHE_TTL_DEFAULT = 1000L * 30;
     //做为stream加载表的时候一次fetch多少条数据
