@@ -1,8 +1,9 @@
 package com.github.aly8246.example.jdbc
 
-import com.github.aly8246.catalog.JdbcOption.JdbcOptionBuilder
-import com.github.aly8246.catalog.{JdbcOption, PhoenixJdbcCatalog}
+import com.github.aly8246.option.JdbcOption.JdbcOptionBuilder
+import com.github.aly8246.catalog.PhoenixJdbcCatalog
 import com.github.aly8246.example.EnvCreate
+import com.github.aly8246.option.JdbcOption
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.catalog.Catalog
@@ -14,7 +15,9 @@ object CatalogApplication {
   def main(args: Array[String]): Unit = {
     val envTuple: (StreamExecutionEnvironment, StreamTableEnvironment) = EnvCreate.createEnv(args)
 
-    val jdbcOption: JdbcOption = new JdbcOptionBuilder().url("").build()
+    val jdbcOption: JdbcOption = new JdbcOptionBuilder()
+      .url("jdbc:phoenix:hadoop1,hadoop2,hadoop3:2181/default")
+      .build()
 
     //根据连接信息创建catalog
     val phoenixCatalog: Catalog = new PhoenixJdbcCatalog(jdbcOption)

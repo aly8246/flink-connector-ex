@@ -1,5 +1,6 @@
 package com.github.aly8246.catalog;
 
+import com.github.aly8246.option.JdbcOption;
 import org.apache.flink.table.catalog.AbstractCatalog;
 import org.apache.flink.table.catalog.exceptions.CatalogException;
 
@@ -7,10 +8,9 @@ import org.apache.flink.table.catalog.exceptions.CatalogException;
  * 抽象类，继承AbstractCatalog 获得读取元数据的能力
  */
 public abstract class AbstractJdbcCatalog extends AbstractCatalog {
-    private final JdbcOption jdbcOption;
+    protected final JdbcOption jdbcOption;
 
     public AbstractJdbcCatalog(JdbcOption jdbcOption) {
-        //TODO 预处理database和catalogName
         super(jdbcOption.getCatalogName(), jdbcOption.getDatabase());
         this.jdbcOption = jdbcOption;
     }

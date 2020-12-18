@@ -1,8 +1,16 @@
-package com.github.aly8246.catalog;
+package com.github.aly8246.dialect;
 
 import org.apache.flink.table.catalog.ObjectPath;
 
-public interface CatalogDialect {
+import java.io.Serializable;
+
+public interface CatalogDialect extends Serializable {
+
+    /**
+     * 是否是支持的jdbcUrl
+     */
+    boolean supported(String jdbcUrl);
+
     /**
      * 默认数据库的名字
      */
@@ -12,6 +20,21 @@ public interface CatalogDialect {
      * 默认驱动类路径
      */
     String defaultDriverName();
+
+    /**
+     * 获取默认catalog名称，如果用户没有指定，则以此为主
+     */
+    String defaultCatalogName();
+
+    /**
+     * 获取数据库名称，假如用户没有显式指定，应当从url里解析
+     * jdbc:mysql://127.0.0.1:3306/my_db
+     * 应当返回my_db
+     *
+     * @param jdbcUrl jdbc连接地址
+     * @return my_db
+     */
+    String getDatabaseName(String jdbcUrl);
 
 
     /**

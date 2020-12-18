@@ -1,13 +1,21 @@
 package com.github.aly8246.catalog;
 
+import com.github.aly8246.client.DatasourceJdbcConnector;
+import com.github.aly8246.client.JdbcConnector;
+import com.github.aly8246.dialect.CatalogDialect;
+import com.github.aly8246.dialect.PhoenixCatalogDialect;
+import com.github.aly8246.option.JdbcOption;
+import io.vertx.ext.sql.SQLClient;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;
 import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
+import org.apache.flink.types.Row;
 
-import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,17 +24,39 @@ import java.util.Map;
 import static org.apache.flink.connector.jdbc.table.JdbcDynamicTableFactory.*;
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
-public class PhoenixJdbcCatalog extends AbstractJdbcCatalog implements CatalogDialect {
+public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
     public static final String DEFAULT_DATABASE = "default";
+    protected JdbcConnector<Connection, Row> syncJdbcConnector;
+    protected transient Connection syncHikariConnection;
+    private final CatalogDialect catalogDialect;
+
 
     public PhoenixJdbcCatalog(JdbcOption jdbcOption) {
         super(jdbcOption);
+        this.catalogDialect = new PhoenixCatalogDialect();
     }
 
+    @Override
+    public void open() throws CatalogException {
+        super.open();
+        //创建同步连接器
+        this.syncJdbcConnector = new DatasourceJdbcConnector();
+
+        //打开jdbc连接
+        this.syncHikariConnection = syncJdbcConnector.syncConnector(this.jdbcOption.getUrl(),
+                this.jdbcOption.getUsername(),
+                this.jdbcOption.getPassword(),
+                this.jdbcOption.getDriver());
+    }
 
     @Override
     public void close() throws CatalogException {
-
+        //关闭jdbc连接
+        try {
+            this.syncHikariConnection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -85,9 +115,12 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog implements CatalogDi
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
         //获取数据库信息和表信息，假如没有schema，就使用默认数据库名字来代替
-        ObjectPath objectPath = this.getOrDefault(tablePath);
+        ObjectPath objectPath = this.catalogDialect.getOrDefault(tablePath);
 
-        //DriverManager.getConnection();
+        syncJdbcConnector.select("select * from SYSTEM.CATALOG WHERE TABLE_NAME = '" + objectPath.getObjectName().toUpperCase() + "'", rows -> {
+            System.out.println(rows);
+        }, null, this.syncHikariConnection);
+
 
         TableSchema tableSchema = new TableSchema
                 .Builder()
@@ -97,7 +130,7 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog implements CatalogDi
         //
         Map<String, String> props = new HashMap<>();
         props.put(CONNECTOR.key(), IDENTIFIER);
-        props.put(URL.key(), "123");
+        props.put(URL.key(), this.jdbcOption.getUrl());
         props.put(TABLE_NAME.key(), objectPath.getFullName());
 //        props.put(USERNAME.key(), "username");
 //        props.put(PASSWORD.key(), pwd);
@@ -241,19 +274,4 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog implements CatalogDi
     }
 
 
-    /**
-     * 返回默认数据库名字
-     */
-    @Override
-    public String defaultSchemaName() {
-        return "DEFAULT";
-    }
-
-    /**
-     * 返回默认驱动名字
-     */
-    @Override
-    public String defaultDriverName() {
-        return "org.apache.phoenix.jdbc.PhoenixDriver";
-    }
 }

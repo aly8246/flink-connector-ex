@@ -3,49 +3,42 @@ package com.github.aly8246.client;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * 抽象jdbc连接
  *
  * @param <C> client or connection
  * @param <R> result
  */
-public interface JdbcConnector<C, R extends Row> {
+public interface JdbcConnector<C, R extends Row> extends Serializable {
 
     /**
-     * 接受该jdbc url吗
+     * 创建一个jdbc异步连接器
      */
-    default Boolean acceptUrl(String jdbcUrl) {
-        return jdbcUrl.startsWith("jdbc:");
-    }
+    C asyncConnector(String jdbcUrl, String username, String password, String driver);
 
-    /**
-     * 创建一个jdbc连接器
-     */
-    C createConnector(String jdbcUrl, String username, String password);
+    C syncConnector(String jdbcUrl, String username, String password, String driver);
 
     /**
      * 创建一个jdbc连接器，并且不需要密码认证
      *
      * @param jdbcUrl jdbcUrl
      */
-    default C createConnector(String jdbcUrl) {
-        return this.createConnector(jdbcUrl, null, null);
+    default C asyncConnector(String jdbcUrl, String driver) {
+        return this.asyncConnector(jdbcUrl, null, null, driver);
     }
 
     /**
-     * 获取默认的驱动class
+     * 通过sql语句进行查询并且拿到返回结果
      *
-     * @param jdbcUrl url
+     * @param sql              查询sql
+     * @param successHandler   成功回调方法
+     * @param exceptionHandler 异常回调方法
+     * @param connectorClient  jdbc客户端
      */
-    default String defaultJdbcDriver(String jdbcUrl) {
-        if (StringUtils.isEmpty(jdbcUrl)) {
-            throw new NullPointerException("jdbc url 不能为空");
-        }
-        if (jdbcUrl.startsWith("jdbc:mysql:"))
-            return "com.mysql.cj.jdbc.Driver";
-        if (jdbcUrl.startsWith("jdbc:phoenix:"))
-            return "org.apache.phoenix.jdbc.PhoenixDriver";
-        //没有支持的url
-        throw new UnsupportedOperationException("不支持的jdbc驱动类型");
-    }
+    void select(String sql, Consumer<List<Row>> successHandler, Consumer<Throwable> exceptionHandler, C connectorClient);
+
 }

@@ -2,11 +2,18 @@ package com.github.aly8246.client;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 使用vert.x来创建SQLClient
@@ -22,13 +29,13 @@ public class VertxAsyncJdbcConnector implements JdbcConnector<SQLClient, Row> {
      * @return jdbc异步客户端
      */
     @Override
-    public SQLClient createConnector(String jdbcUrl, String username, String password) {
+    public SQLClient asyncConnector(String jdbcUrl, String username, String password, String driver) {
         Vertx vertx = Vertx.vertx(new VertxOptions()
                 .setWorkerPoolSize(10)
                 .setEventLoopPoolSize(10));
         JsonObject config = new JsonObject()
                 .put("jdbcUrl", jdbcUrl)
-                .put("driverClassName", this.defaultJdbcDriver(jdbcUrl))
+                .put("driverClassName", driver)
                 .put("autoCommit", true)
                 .put("connectionTimeout", 9000)
                 .put("idleTimeout", 30000)
@@ -46,4 +53,44 @@ public class VertxAsyncJdbcConnector implements JdbcConnector<SQLClient, Row> {
         }
         return JDBCClient.createShared(vertx, config);
     }
+
+    @Override
+    public SQLClient syncConnector(String jdbcUrl, String username, String password, String driver) {
+        throw new UnsupportedOperationException("vert.x暂未支持同步连接器");
+    }
+
+    @Override
+    public void select(String sql, Consumer<List<Row>> successHandler, Consumer<Throwable> exceptionHandler, SQLClient connectorClient) {
+        //打开jdbc连接
+        connectorClient.getConnection(sqlConnectionAsyncResult -> {
+            //获取sql连接
+            SQLConnection sqlConnection = sqlConnectionAsyncResult.result();
+            //开始查询
+            sqlConnection.query(sql, resultSetAsyncResult -> {
+                //假如查询成功
+                if (resultSetAsyncResult.succeeded()) {
+                    //从查询结果中获取结果集
+                    ResultSet result = resultSetAsyncResult.result();
+
+                    //用来存放要返回的结果集，这里用linkedList来保证row的顺序性
+                    List<Row> rowList = new LinkedList<>();
+
+                    while (result != null) {
+                        for (JsonArray jsonArray : result.getResults()) {
+                            //创建flink row
+                            Row completeRow = Row.of(jsonArray.stream().toArray());
+                            rowList.add(completeRow);
+                        }
+                        result = result.getNext();
+                    }
+                    //处理完所有的row，交给用户处理
+                    successHandler.accept(rowList);
+                }
+            });
+            //关闭连接
+            sqlConnection.close();
+        });
+    }
+
+
 }
