@@ -5,7 +5,7 @@ import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.table.api.EnvironmentSettings
-import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 
 object EnvCreate {
   def createEnv(args: Array[String]): (StreamExecutionEnvironment, StreamTableEnvironment) = {

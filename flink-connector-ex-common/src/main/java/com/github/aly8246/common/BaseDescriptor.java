@@ -50,7 +50,7 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
     //schema
     public static final String CONNECTOR_SCHEMA_DATA_TYPE = SCHEMA + ".#." + SCHEMA_DATA_TYPE;
     public static final String CONNECTOR_SCHEMA_NAME = SCHEMA + ".#." + SCHEMA_NAME;
-    public static final String CONNECTOR_SCHEMA_SCHEMA_EXPR = SCHEMA + ".#." + TABLE_SCHEMA_EXPR;
+    public static final String CONNECTOR_SCHEMA_SCHEMA_EXPR = SCHEMA + ".#." + "expr";
 
     //watermark
     public static final String CONNECTOR_SCHEMA_WATERMARK_ROW_TIME = SCHEMA + "." + WATERMARK + ".#." + WATERMARK_ROWTIME;

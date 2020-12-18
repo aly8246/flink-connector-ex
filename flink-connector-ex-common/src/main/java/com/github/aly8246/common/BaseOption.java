@@ -44,7 +44,7 @@ public class BaseOption implements Serializable {
         this.retry = descriptorProperties.getOptionalLong(SOURCE_MAX_RETRIES).orElse(SOURCE_MAX_RETRIES_DEFAULT);
 
         //sink参数
-        this.bufferMaxRow = descriptorProperties.getOptionalLong(SOURCE_MAX_RETRIES).orElse(SOURCE_MAX_RETRIES_DEFAULT);
+        this.bufferMaxRow = descriptorProperties.getOptionalLong(WRITE_FLUSH_MAX_ROWS).orElse(WRITE_FLUSH_MAX_ROWS_DEFAULT);
         this.bufferMaxInterval = descriptorProperties.getOptionalLong(WRITE_FLUSH_INTERVAL).orElse(WRITE_FLUSH_INTERVAL_DEFAULT);
 
         //简单匹配一个密码

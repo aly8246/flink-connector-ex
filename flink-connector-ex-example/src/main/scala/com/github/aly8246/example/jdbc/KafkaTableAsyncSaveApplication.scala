@@ -2,7 +2,7 @@ package com.github.aly8246.example.jdbc
 
 import com.github.aly8246.example.EnvCreate
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.types.Row
 
 /**

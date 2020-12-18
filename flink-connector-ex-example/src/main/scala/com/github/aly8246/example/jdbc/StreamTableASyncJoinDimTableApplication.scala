@@ -1,8 +1,10 @@
 package com.github.aly8246.example.jdbc
 
+import java.util.function.Consumer
+
 import com.github.aly8246.example.EnvCreate
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.types.Row
 
 /**
@@ -13,7 +15,7 @@ object StreamTableASyncJoinDimTableApplication {
     val envTuple: (StreamExecutionEnvironment, StreamTableEnvironment) = EnvCreate.createEnv(args)
 
     //创建流表
-    envTuple._2.sqlUpdate(
+    envTuple._2.executeSql(
       """
         |create table stream_item(
         | id bigint comment '物品ID',
@@ -30,7 +32,7 @@ object StreamTableASyncJoinDimTableApplication {
         |""".stripMargin)
 
     //创建维表
-    envTuple._2.sqlUpdate(
+    envTuple._2.executeSql(
       """
         |create table dim_user(
         | id bigint comment '用户ID',
@@ -46,7 +48,7 @@ object StreamTableASyncJoinDimTableApplication {
         | )
         |""".stripMargin)
 
-    envTuple._2.sqlQuery(
+    envTuple._2.executeSql(
       """
         |select
         | si.id as stream_iid,
@@ -58,10 +60,8 @@ object StreamTableASyncJoinDimTableApplication {
         |left join dim_user FOR SYSTEM_TIME AS OF si.process_time as du
         |on si.user_id = du.id
         |""".stripMargin)
-      .toRetractStream[Row]
-      .print("流表异步join维表")
+      .print()
 
-    envTuple._1.execute()
   }
 
 }

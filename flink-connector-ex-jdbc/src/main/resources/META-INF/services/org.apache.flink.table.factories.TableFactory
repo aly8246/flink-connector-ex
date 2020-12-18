@@ -13,4 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-com.github.aly8246.factory.JdbcExSourceSinkFactory
+##com.github.aly8246.fq.factory.JdbcExSourceSinkFactory

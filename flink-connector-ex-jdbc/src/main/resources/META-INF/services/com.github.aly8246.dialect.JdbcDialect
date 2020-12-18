@@ -13,5 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-com.github.aly8246.dialect.MysqlDialect
-com.github.aly8246.dialect.PhoenixDialect
+#com.github.aly8246.fq.dialect.MysqlDialect
+#com.github.aly8246.fq.dialect.PhoenixDialect
