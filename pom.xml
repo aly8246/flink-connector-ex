@@ -27,10 +27,15 @@
         <hadoop.version>3.0.0-cdh6.2.1</hadoop.version>
         <hikari.version>3.1.0</hikari.version>
         <vert.x.version>4.0.0</vert.x.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <dependencies>
-
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -85,7 +90,20 @@
                 <artifactId>flink-connector-jdbc_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-test-utils_${scala.binary.version}</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
             <!--flink-->
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
 
             <!--phoenix-->
             <dependency>

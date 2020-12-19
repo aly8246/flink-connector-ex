@@ -4,6 +4,7 @@ import com.github.aly8246.client.DatasourceJdbcConnector;
 import com.github.aly8246.client.JdbcConnector;
 import com.github.aly8246.dialect.CatalogDialect;
 import com.github.aly8246.dialect.PhoenixCatalogDialect;
+import com.github.aly8246.factory.JdbcDynamicTableFactory;
 import com.github.aly8246.option.JdbcOption;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
@@ -132,7 +133,7 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
 
         //生成配置文件，这将会传递给TableFactory，接入传统Factory模式
         Map<String, String> props = new HashMap<>();
-        props.put(CONNECTOR.key(), IDENTIFIER);
+        props.put(CONNECTOR.key(), JdbcDynamicTableFactory.IDENTIFIER);
         props.put(URL.key(), this.jdbcOption.getUrl());
         props.put(TABLE_NAME.key(), objectPath.getFullName());
 //        props.put(USERNAME.key(), "username");

@@ -1,6 +1,7 @@
 package com.github.aly8246.catalog;
 
 import com.github.aly8246.client.JdbcConnector;
+import com.github.aly8246.dialect.CatalogDialect;
 import org.apache.flink.table.types.DataType;
 
 import java.io.Serializable;
@@ -18,6 +19,10 @@ public class PhoenixCatalog implements Serializable {
 
     /**
      * 从catalog数据库查询表的catalog的rows，然后解析成字段名称，数据类型
+     * 要非常注意的是，这里e.row.getField的index和{@link CatalogDialect#catalogQueryStmt(org.apache.flink.table.catalog.ObjectPath)}
+     * 返回sql里面select的字段顺序一致
+     * 假设select 字段名，表名 from catalog
+     * 那么 e.row.getField(0) 就是字段名，e.row.getField(1)就是表名
      *
      * @param jdbcResultList 从jdbc查询catalog的结构
      */
@@ -57,12 +62,16 @@ public class PhoenixCatalog implements Serializable {
                     //字段flink-jdbc类型
                     DataType columnDataType = PhoenixTypeMapping.fromJdbcTypeId(Objects.requireNonNull(columnTypeId), columnSize);
 
+                    //返回catalog实体类
                     return new CatalogEntity(tableName, columnName, columnTypeId, columnDataType, columnSize, pk == 1, nullable != 0, order);
                 })
                 .collect(Collectors.toList());
 
+        //获取字段名字
         this.columnNames = catalogEntityList.stream().map(CatalogEntity::getFieldName).toArray(String[]::new);
+        //获取字段数据类型
         this.columnDataTypes = catalogEntityList.stream().map(CatalogEntity::getDataType).toArray(DataType[]::new);
+        //获取catalog实体类
         this.catalogEntityList = catalogEntityList;
     }
 
