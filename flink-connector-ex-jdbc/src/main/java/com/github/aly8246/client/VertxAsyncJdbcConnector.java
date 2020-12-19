@@ -11,8 +11,10 @@ import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 
+import java.sql.ResultSetMetaData;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -60,7 +62,7 @@ public class VertxAsyncJdbcConnector implements JdbcConnector<SQLClient, Row> {
     }
 
     @Override
-    public void select(String sql, Consumer<List<Row>> successHandler, Consumer<Throwable> exceptionHandler, SQLClient connectorClient) {
+    public void select(String sql, BiConsumer<List<Row>, ResultSetMetaData> successHandler, Consumer<Throwable> exceptionHandler, SQLClient connectorClient) {
         //打开jdbc连接
         connectorClient.getConnection(sqlConnectionAsyncResult -> {
             //获取sql连接
@@ -84,7 +86,7 @@ public class VertxAsyncJdbcConnector implements JdbcConnector<SQLClient, Row> {
                         result = result.getNext();
                     }
                     //处理完所有的row，交给用户处理
-                    successHandler.accept(rowList);
+                    successHandler.accept(rowList, null);
                 }
             });
             //关闭连接
@@ -92,5 +94,8 @@ public class VertxAsyncJdbcConnector implements JdbcConnector<SQLClient, Row> {
         });
     }
 
-
+    @Override
+    public List<JdbcResult> select(String sql, SQLClient connectorClient) {
+        throw new UnsupportedOperationException("不支持此方法");
+    }
 }

@@ -1,10 +1,11 @@
 package com.github.aly8246.client;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 
 import java.io.Serializable;
+import java.sql.ResultSetMetaData;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -38,7 +39,20 @@ public interface JdbcConnector<C, R extends Row> extends Serializable {
      * @param successHandler   成功回调方法
      * @param exceptionHandler 异常回调方法
      * @param connectorClient  jdbc客户端
+     * @return
      */
-    void select(String sql, Consumer<List<Row>> successHandler, Consumer<Throwable> exceptionHandler, C connectorClient);
+    void select(String sql, BiConsumer<List<Row>, ResultSetMetaData> successHandler, Consumer<Throwable> exceptionHandler, C connectorClient);
+
+    List<JdbcResult> select(String sql, C connectorClient);
+
+    class JdbcResult {
+        public Row row;
+        public ResultSetMetaData metaData;
+
+        public JdbcResult(Row result, ResultSetMetaData metaData) {
+            this.row = result;
+            this.metaData = metaData;
+        }
+    }
 
 }

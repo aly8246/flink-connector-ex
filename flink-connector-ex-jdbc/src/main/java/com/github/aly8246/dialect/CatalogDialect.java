@@ -63,4 +63,11 @@ public interface CatalogDialect extends Serializable {
         return schemaAndTable;
     }
 
+
+    /**
+     * 封装查询catalog的sql
+     */
+    String catalogQueryStmt(ObjectPath tablePath);
+
+
 }

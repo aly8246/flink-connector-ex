@@ -5,7 +5,6 @@ import com.github.aly8246.client.JdbcConnector;
 import com.github.aly8246.dialect.CatalogDialect;
 import com.github.aly8246.dialect.PhoenixCatalogDialect;
 import com.github.aly8246.option.JdbcOption;
-import io.vertx.ext.sql.SQLClient;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
@@ -117,17 +116,21 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
         //获取数据库信息和表信息，假如没有schema，就使用默认数据库名字来代替
         ObjectPath objectPath = this.catalogDialect.getOrDefault(tablePath);
 
-        syncJdbcConnector.select("select * from SYSTEM.CATALOG WHERE TABLE_NAME = '" + objectPath.getObjectName().toUpperCase() + "'", rows -> {
-            System.out.println(rows);
-        }, null, this.syncHikariConnection);
+        //通过jdbc查询，获取查询结果，查询表的catalog结构
+        List<JdbcConnector.JdbcResult> jdbcResultList = syncJdbcConnector.select(
+                this.catalogDialect.catalogQueryStmt(tablePath),
+                this.syncHikariConnection);
 
+        //把查询结果转换成catalog实体类
+        PhoenixCatalog phoenixCatalog = new PhoenixCatalog(jdbcResultList);
 
-        TableSchema tableSchema = new TableSchema
-                .Builder()
-                //TODO String[] names
-                //     ataType[] types
+        //根据catalog实体类来构建表结构
+        TableSchema tableSchema = TableSchema
+                .builder()
+                .fields(phoenixCatalog.getColumnNames(), phoenixCatalog.getColumnDataTypes())
                 .build();
-        //
+
+        //生成配置文件，这将会传递给TableFactory，接入传统Factory模式
         Map<String, String> props = new HashMap<>();
         props.put(CONNECTOR.key(), IDENTIFIER);
         props.put(URL.key(), this.jdbcOption.getUrl());

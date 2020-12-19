@@ -1,5 +1,7 @@
 package com.github.aly8246.dialect;
 
+import org.apache.flink.table.catalog.ObjectPath;
+
 /**
  * java spi注册catalog方言
  */
@@ -52,4 +54,17 @@ public class PhoenixCatalogDialect implements CatalogDialect {
         return jdbcUrl.split("/")[1];
     }
 
+    @Override
+    public String catalogQueryStmt(ObjectPath tablePath) {
+        return "select " +
+                "TABLE_NAME," +
+                "COLUMN_NAME," +
+                "DATA_TYPE," +
+                "COLUMN_SIZE," +
+                "NULLABLE," +
+                "ORDINAL_POSITION," +
+                "KEY_SEQ " +
+                "from SYSTEM.CATALOG " +
+                "WHERE TABLE_NAME = '" + tablePath.getObjectName().toUpperCase() + "'";
+    }
 }
