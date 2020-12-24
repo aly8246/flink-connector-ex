@@ -1,7 +1,7 @@
 package com.github.aly8246.factory;
 
 import com.github.aly8246.JdbcCatalogValidator;
-import com.github.aly8246.catalog.JdbcCatalog;
+import com.github.aly8246.dialect.CatalogDialect;
 import com.github.aly8246.option.JdbcOption;
 import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.descriptors.DescriptorProperties;
@@ -39,9 +39,13 @@ public class PhoenixCatalogFactory implements CatalogFactory {
                 .catalogName(s)
                 .build();
 
-        //创建通用catalog
-        return new JdbcCatalog(jdbcOption);
+        //获取支持url的catalog
+        CatalogDialect<? extends Catalog> catalogDialect = jdbcOption.getCatalogDialect();
+
+        //创建catalog
+        return catalogDialect.createCatalog(jdbcOption);
     }
+
 
     /**
      * 支持这个catalog吗

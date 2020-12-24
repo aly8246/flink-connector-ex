@@ -6,6 +6,7 @@ import com.github.aly8246.dialect.CatalogDialect;
 import com.github.aly8246.dialect.PhoenixCatalogDialect;
 import com.github.aly8246.factory.JdbcDynamicTableFactory;
 import com.github.aly8246.option.JdbcOption;
+import org.apache.flink.annotation.Internal;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
@@ -24,6 +25,7 @@ import java.util.Map;
 import static org.apache.flink.connector.jdbc.table.JdbcDynamicTableFactory.*;
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
+@Internal
 public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
     public static final String DEFAULT_DATABASE = "default";
     protected JdbcConnector<Connection, Row> syncJdbcConnector;
