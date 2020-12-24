@@ -1,9 +1,9 @@
 //package com.github.aly8246.fq.option;
 //
-//import com.github.aly8246.common.SourceSinkContext;
+//import com.github.aly8246.common.ConnectorContext;
 //
 //
-//public interface JdbcContext extends SourceSinkContext<JdbcOption> {
+//public interface JdbcContext extends ConnectorContext<JdbcOption> {
 //
 //    /**
 //     * 根据要查询的字段生成sql

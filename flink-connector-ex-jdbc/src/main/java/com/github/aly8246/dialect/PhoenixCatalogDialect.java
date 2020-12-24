@@ -1,11 +1,15 @@
 package com.github.aly8246.dialect;
 
+import com.github.aly8246.catalog.AbstractJdbcCatalog;
+import com.github.aly8246.catalog.PhoenixJdbcCatalog;
+import com.github.aly8246.option.JdbcOption;
+import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.ObjectPath;
 
 /**
  * java spi注册catalog方言
  */
-public class PhoenixCatalogDialect implements CatalogDialect {
+public class PhoenixCatalogDialect implements CatalogDialect<PhoenixJdbcCatalog> {
 
     @Override
     public boolean supported(String jdbcUrl) {
@@ -66,5 +70,12 @@ public class PhoenixCatalogDialect implements CatalogDialect {
                 "KEY_SEQ " +
                 "from SYSTEM.CATALOG " +
                 "WHERE TABLE_NAME = '" + tablePath.getObjectName().toUpperCase() + "'";
+    }
+
+    @Override
+    public AbstractJdbcCatalog createCatalog(JdbcOption jdbcOption) {
+        if (!this.supported(jdbcOption.getUrl()))
+            throw new UnsupportedOperationException("不支持该jdbc url的catalog:"+jdbcOption);
+        return new PhoenixJdbcCatalog(jdbcOption);
     }
 }

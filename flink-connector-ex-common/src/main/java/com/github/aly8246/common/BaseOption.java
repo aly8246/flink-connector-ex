@@ -1,12 +1,11 @@
 package com.github.aly8246.common;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import static com.github.aly8246.common.BaseDescriptor.*;
+import static com.github.aly8246.common.AbstractDescriptor.*;
 
 public class BaseOption implements Serializable {
     //开启异步表支持
@@ -34,7 +33,9 @@ public class BaseOption implements Serializable {
      * 从配置文件创建
      * 这里简单匹配一个密码，从配置文件中搜素带有password的配置来设置为密码
      * 假如你的配置里有多个包含password的选项，则需要自己来修正password
+     * 在dynamicFactory中不被支持
      */
+    @Deprecated
     public BaseOption(DescriptorProperties descriptorProperties) {
         descriptorProperties.getOptionalBoolean(ASYNC_SUPPORT_KEY).ifPresent(this::setAsyncSupported);
         //source参数
@@ -57,6 +58,8 @@ public class BaseOption implements Serializable {
                 .findFirst()
                 .ifPresent(this::setPassword);
     }
+
+
 
     /**
      * 是否包含密码

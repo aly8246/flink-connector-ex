@@ -1,6 +1,6 @@
 //package com.github.aly8246.fq.descriptor;
 //
-//import com.github.aly8246.common.BaseDescriptor;
+//import com.github.aly8246.common.AbstractDescriptor;
 //import com.github.aly8246.fq.dialect.JdbcDialect;
 //import com.github.aly8246.fq.dialect.JdbcDialectService;
 //import org.apache.flink.table.descriptors.DescriptorProperties;
@@ -12,7 +12,7 @@
 //import java.util.Map;
 //import java.util.Optional;
 //
-//public class JdbcDescriptor extends BaseDescriptor {
+//public class JdbcDescriptor extends AbstractDescriptor {
 //    //connector类型
 //    public static final String CONNECTOR_VALUE = "jdbc-ex";
 //

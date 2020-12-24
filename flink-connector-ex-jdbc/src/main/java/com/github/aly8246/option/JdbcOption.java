@@ -3,6 +3,7 @@ package com.github.aly8246.option;
 import com.github.aly8246.dialect.CatalogDialect;
 import com.github.aly8246.dialect.CatalogDialectServices;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.util.Preconditions;
 
 public class JdbcOption {
@@ -19,7 +20,7 @@ public class JdbcOption {
 
     private String catalogName;
 
-    private CatalogDialect catalogDialect;
+    private CatalogDialect<? extends Catalog> catalogDialect;
 
     public String getUrl() {
         return url;
@@ -66,7 +67,7 @@ public class JdbcOption {
     }
 
 
-    public CatalogDialect getCatalogDialect() {
+    public CatalogDialect<? extends Catalog> getCatalogDialect() {
         return catalogDialect;
     }
 
@@ -80,7 +81,7 @@ public class JdbcOption {
         return this.catalogName;
     }
 
-    public JdbcOption(String url, String driver, String username, String password, String catalogName, String database, CatalogDialect catalogDialect) {
+    public JdbcOption(String url, String driver, String username, String password, String catalogName, String database, CatalogDialect<? extends Catalog> catalogDialect) {
         this.url = url;
         this.driver = driver;
         this.username = username;
@@ -88,6 +89,19 @@ public class JdbcOption {
         this.catalogName = catalogName;
         this.database = database;
         this.catalogDialect = catalogDialect;
+    }
+
+    @Override
+    public String toString() {
+        return "JdbcOption{" +
+                "url='" + url + '\'' +
+                ", driver='" + driver + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", database='" + database + '\'' +
+                ", catalogName='" + catalogName + '\'' +
+                ", catalogDialect=" + catalogDialect +
+                '}';
     }
 
     /**
@@ -155,6 +169,30 @@ public class JdbcOption {
         }
 
         /**
+         * 用户名
+         */
+        public JdbcOptionBuilder username(String username) {
+            Preconditions.checkArgument(
+                    StringUtils.isNotEmpty(username),
+                    "用户名和密码不能为空"
+            );
+            this.username = username;
+            return this;
+        }
+
+        /**
+         * 密码
+         */
+        public JdbcOptionBuilder password(String password) {
+            Preconditions.checkArgument(
+                    StringUtils.isNotEmpty(password),
+                    "用户名和密码不能为空"
+            );
+            this.password = password;
+            return this;
+        }
+
+        /**
          * catalog名字，默认为catalog实现类
          *
          * @param catalogName catalog名字
@@ -194,7 +232,7 @@ public class JdbcOption {
             );
 
             //获取受支持的catalog
-            CatalogDialect catalogDialect = CatalogDialectServices.getCatalogDialect(this.url);
+            CatalogDialect<? extends Catalog> catalogDialect = CatalogDialectServices.getCatalogDialect(this.url);
 
             return new JdbcOption(this.url, this.driver, this.username, this.password, this.catalogName, this.databaseName, catalogDialect);
         }

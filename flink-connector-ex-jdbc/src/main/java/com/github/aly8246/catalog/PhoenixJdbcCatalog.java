@@ -28,7 +28,7 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
     public static final String DEFAULT_DATABASE = "default";
     protected JdbcConnector<Connection, Row> syncJdbcConnector;
     protected transient Connection syncHikariConnection;
-    private final CatalogDialect catalogDialect;
+    private final CatalogDialect<PhoenixJdbcCatalog> catalogDialect;
 
 
     public PhoenixJdbcCatalog(JdbcOption jdbcOption) {

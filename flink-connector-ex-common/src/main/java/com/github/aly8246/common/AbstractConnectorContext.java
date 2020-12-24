@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static org.apache.flink.table.descriptors.Schema.SCHEMA;
 
-public class BaseConnectorContext<T extends BaseOption> implements SourceSinkContext<T> {
+public abstract class AbstractConnectorContext<T extends BaseOption> implements ConnectorContext<T> {
     //配置选项
     private final T option;
 
@@ -81,7 +81,7 @@ public class BaseConnectorContext<T extends BaseOption> implements SourceSinkCon
         return this.option.asyncSupported;
     }
 
-    public BaseConnectorContext(T option, Map<String, String> properties) {
+    public AbstractConnectorContext(T option, Map<String, String> properties) {
         this.option = option;
         this.properties = properties;
     }

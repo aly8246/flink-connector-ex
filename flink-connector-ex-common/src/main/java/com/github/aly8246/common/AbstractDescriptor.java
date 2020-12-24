@@ -1,20 +1,52 @@
 package com.github.aly8246.common;
 
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.table.descriptors.ConnectorDescriptorValidator;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.flink.table.descriptors.DescriptorProperties.*;
 import static org.apache.flink.table.descriptors.Schema.*;
 
-public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
-    private static final Logger log = LoggerFactory.getLogger(BaseDescriptor.class);
+public abstract class AbstractDescriptor extends ConnectorDescriptorValidator {
+    private static final Logger log = LoggerFactory.getLogger(AbstractDescriptor.class);
+
+    public static final ConfigOption<Boolean> ASYNC_SUPPORT = ConfigOptions.
+            key("async-support")
+            .booleanType()
+            .defaultValue(true)
+            .withDescription("是否开启异步支持 默认开启异步支持");
+    public static final ConfigOption<Integer> SINK_FLUSH_ROWS = ConfigOptions
+            .key("sink.flush-row")
+            .intType()
+            .defaultValue(1)
+            .withDescription("写缓冲区数据累计多少条后被写入db");
+    public static final ConfigOption<Integer> SINK_FLUSH_INTERVAL = ConfigOptions
+            .key("sink.flush-interval")
+            .intType()
+            .defaultValue(1000)
+            .withDescription("写缓冲区数据累计多少毫秒后被写入db");
+
+    public static final ConfigOption<Integer> SOURCE_CACHED_ROW = ConfigOptions
+            .key("source.cached-row")
+            .intType()
+            .defaultValue(20000)
+            .withDescription("读缓冲区缓存多少条数据");
+    public static final ConfigOption<Integer> SOURCE_CACHED_INTERVAL = ConfigOptions
+            .key("source.cached-interval")
+            .intType()
+            .defaultValue(1000 * 30)
+            .withDescription("读缓冲区缓存多少秒");
+    public static final ConfigOption<Integer> SOURCE_FETCH_ROW = ConfigOptions
+            .key("")
+            .intType()
+            .defaultValue(1)
+            .withDescription("");
 
     //开启异步表支持
     public static final String ASYNC_SUPPORT_KEY = "async-support";
@@ -74,7 +106,9 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
 
     /**
      * 支持的配置参数
+     * 在dynamicFactory中不被支持
      */
+    @Deprecated
     public List<String> supportedProperties() {
         List<String> supportedList = new ArrayList<>();
         //异步支持
@@ -101,8 +135,13 @@ public abstract class BaseDescriptor extends ConnectorDescriptorValidator {
         supportedList.add(CONNECTOR_SCHEMA_WATERMARK_STRATEGY_EXPR);
         supportedList.add(CONNECTOR_SCHEMA_WATERMARK_STRATEGY_DATA_TYPE);
 
-
         return supportedList;
+    }
+
+    public Set<ConfigOption<?>> supportedDynamicProperties() {
+        Set<ConfigOption<?>> supportedOptionSet = new HashSet<>();
+
+        return null;
     }
 
     /**

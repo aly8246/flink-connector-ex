@@ -5,7 +5,7 @@ import org.apache.flink.table.api.TableSchema;
 import java.io.Serializable;
 import java.util.Map;
 
-public interface SourceSinkContext<T extends BaseOption> extends Serializable {
+public interface ConnectorContext<T extends BaseOption> extends Serializable {
 
     /**
      * 获取配置选项

@@ -1,11 +1,11 @@
 //package com.github.aly8246.fq.option;
 //
-//import com.github.aly8246.common.BaseConnectorContext;
+//import com.github.aly8246.common.AbstractConnectorContext;
 //import com.github.aly8246.fq.dialect.JdbcDialect;
 //
 //import java.util.Map;
 //
-//public class JdbcSourceSinkContext extends BaseConnectorContext<JdbcOption> implements JdbcContext {
+//public class JdbcSourceSinkContext extends AbstractConnectorContext<JdbcOption> implements JdbcContext {
 //    public JdbcSourceSinkContext(JdbcOption option, Map<String, String> properties) {
 //        super(option, properties);
 //    }

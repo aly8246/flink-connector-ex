@@ -1,10 +1,13 @@
 package com.github.aly8246.dialect;
 
+import com.github.aly8246.catalog.AbstractJdbcCatalog;
+import com.github.aly8246.option.JdbcOption;
+import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.ObjectPath;
 
 import java.io.Serializable;
 
-public interface CatalogDialect extends Serializable {
+public interface CatalogDialect<T> extends Serializable {
 
     /**
      * 是否是支持的jdbcUrl
@@ -69,5 +72,11 @@ public interface CatalogDialect extends Serializable {
      */
     String catalogQueryStmt(ObjectPath tablePath);
 
-
+    /**
+     * 创建catalog
+     *
+     * @param jdbcOption jdbc配置选项
+     * @return 创建好的catalog
+     */
+    AbstractJdbcCatalog createCatalog(JdbcOption jdbcOption);
 }
