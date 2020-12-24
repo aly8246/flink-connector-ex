@@ -6,6 +6,8 @@ import com.github.aly8246.dialect.CatalogDialect;
 import com.github.aly8246.dialect.PhoenixCatalogDialect;
 import com.github.aly8246.factory.JdbcDynamicTableFactory;
 import com.github.aly8246.option.JdbcOption;
+import com.github.aly8246.resolver.MetaDataResolver;
+import com.github.aly8246.resolver.PhoenixMetaDataResolver;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
@@ -125,12 +127,13 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
                 this.syncHikariConnection);
 
         //把查询结果转换成catalog实体类
-        PhoenixCatalog phoenixCatalog = new PhoenixCatalog(jdbcResultList);
+        MetaDataResolver metaDataResolver = new PhoenixMetaDataResolver();
+        metaDataResolver.setJdbcResult(jdbcResultList);
 
         //根据catalog实体类来构建表结构
         TableSchema tableSchema = TableSchema
                 .builder()
-                .fields(phoenixCatalog.getColumnNames(), phoenixCatalog.getColumnDataTypes())
+                .fields(metaDataResolver.getColumnNames(), metaDataResolver.getColumnDataTypes())
                 .build();
 
         //生成配置文件，这将会传递给TableFactory，接入传统Factory模式
