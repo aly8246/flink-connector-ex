@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.flink.connector.jdbc.table.JdbcDynamicTableFactory.*;
+import static com.github.aly8246.factory.JdbcDynamicTableFactory.TABLE_NAME;
+import static com.github.aly8246.factory.JdbcDynamicTableFactory.URL;
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
 @Internal
@@ -116,6 +117,12 @@ public class PhoenixJdbcCatalog extends AbstractJdbcCatalog {
         return null;
     }
 
+    /**
+     * 通过ObjectPath查询表结构并且返回
+     *
+     * @param tablePath 表名全路径
+     * @return 表结构
+     */
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
         //获取数据库信息和表信息，假如没有schema，就使用默认数据库名字来代替

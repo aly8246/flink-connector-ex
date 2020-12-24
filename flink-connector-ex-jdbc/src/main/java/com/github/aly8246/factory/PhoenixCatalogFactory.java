@@ -12,32 +12,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.aly8246.JdbcCatalogValidator.CATALOG_DEFAULT_DATABASE;
-import static com.github.aly8246.JdbcCatalogValidator.CATALOG_PROPERTY_VERSION;
-import static com.github.aly8246.JdbcCatalogValidator.CATALOG_TYPE;
-import static com.github.aly8246.JdbcCatalogValidator.CATALOG_TYPE_VALUE_JDBC;
-import static org.apache.flink.table.descriptors.JdbcCatalogValidator.CATALOG_JDBC_BASE_URL;
-import static org.apache.flink.table.descriptors.JdbcCatalogValidator.CATALOG_JDBC_PASSWORD;
-import static org.apache.flink.table.descriptors.JdbcCatalogValidator.CATALOG_JDBC_USERNAME;
+import static com.github.aly8246.JdbcCatalogValidator.*;
 
 public class PhoenixCatalogFactory implements CatalogFactory {
+
     @Override
     public Catalog createCatalog(String s, Map<String, String> map) {
         //验证配置文件
         final DescriptorProperties prop = getValidatedProperties(map);
 
-        //创建jdbc参数实体
-        JdbcOption.JdbcOptionBuilder jdbcOptionBuilder = new JdbcOption.JdbcOptionBuilder();
-
-        //假如有用户名和密码就设置进去
-        prop.getOptionalString(CATALOG_JDBC_USERNAME).ifPresent(jdbcOptionBuilder::username);
-        prop.getOptionalString(CATALOG_JDBC_PASSWORD).ifPresent(jdbcOptionBuilder::password);
-
-        //根据catalog名字和jdbc url来构建
-        JdbcOption jdbcOption = jdbcOptionBuilder
-                .url(prop.getString(CATALOG_JDBC_BASE_URL))
-                .catalogName(s)
-                .build();
+        //通过验证后的配置文件创建jdbc选项
+        JdbcOption jdbcOption = new JdbcOption(prop);
 
         //获取支持url的catalog
         CatalogDialect<? extends Catalog> catalogDialect = jdbcOption.getCatalogDialect();
@@ -75,10 +60,17 @@ public class PhoenixCatalogFactory implements CatalogFactory {
         return properties;
     }
 
+    /**
+     * 获取验证后的配置文件
+     *
+     * @param properties 原始配置文件
+     * @return 验证后的配置文件
+     */
     private static DescriptorProperties getValidatedProperties(Map<String, String> properties) {
         final DescriptorProperties descriptorProperties = new DescriptorProperties(true);
         descriptorProperties.putProperties(properties);
 
+        //验证配置文件是否支持jdbc catalog
         new JdbcCatalogValidator().validate(descriptorProperties);
 
         return descriptorProperties;

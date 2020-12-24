@@ -3,7 +3,6 @@ package com.github.aly8246.dialect;
 import com.github.aly8246.catalog.AbstractJdbcCatalog;
 import com.github.aly8246.catalog.PhoenixJdbcCatalog;
 import com.github.aly8246.option.JdbcOption;
-import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.ObjectPath;
 
 /**

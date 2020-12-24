@@ -27,7 +27,7 @@ public class JdbcDynamicTableFactory implements DynamicTableSourceFactory, Dynam
         //TODO        validateConfigOptions(config);
         TableSchema physicalSchema = TableSchemaUtils.getPhysicalSchema(context.getCatalogTable().getSchema());
 
-        System.out.println("JdbcDynamicTableFactory.createDynamicTableSource");
+        System.out.println(physicalSchema);
         return null;
     }
 

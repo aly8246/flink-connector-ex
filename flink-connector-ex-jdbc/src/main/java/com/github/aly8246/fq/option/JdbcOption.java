@@ -1,11 +1,10 @@
 //package com.github.aly8246.fq.option;
 //
 //import com.github.aly8246.common.BaseOption;
-//import com.github.aly8246.fq.dialect.JdbcDialect;
-//import com.github.aly8246.fq.dialect.JdbcDialectService;
 //import org.apache.flink.table.descriptors.DescriptorProperties;
 //
-//import static com.github.aly8246.fq.descriptor.JdbcDescriptor.*;
+//import static com.github.aly8246.JdbcCatalogValidator.CATALOG_JDBC_USERNAME;
+//
 //
 //public class JdbcOption extends BaseOption {
 //    //jdbc支持认证 usernamePassword
@@ -36,7 +35,7 @@
 //        this.jdbcDriver = descriptorProperties.getOptionalString(CONNECTOR_DRIVER)
 //                .orElse(this.jdbcDialect.defaultDriverName().get());
 //
-//        descriptorProperties.getOptionalString(CONNECTOR_USERNAME).ifPresent(this::setUsername);
+//        descriptorProperties.getOptionalString(CATALOG_JDBC_USERNAME).ifPresent(this::setUsername);
 //        descriptorProperties.getOptionalString(CONNECTOR_TABLE).ifPresent(this::setTable);
 //        descriptorProperties.getOptionalString(CONNECTOR_URL).ifPresent(this::setUrl);
 //    }

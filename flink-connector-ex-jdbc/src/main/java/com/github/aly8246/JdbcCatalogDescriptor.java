@@ -6,9 +6,8 @@ import org.apache.flink.util.StringUtils;
 
 import java.util.Map;
 
-import static com.github.aly8246.JdbcCatalogValidator.CATALOG_TYPE_VALUE_JDBC;
+import static com.github.aly8246.JdbcCatalogValidator.*;
 import static org.apache.flink.table.descriptors.CatalogDescriptorValidator.CATALOG_DEFAULT_DATABASE;
-import static org.apache.flink.table.descriptors.JdbcCatalogValidator.*;
 import static org.apache.flink.util.Preconditions.checkArgument;
 
 public class JdbcCatalogDescriptor extends CatalogDescriptor {

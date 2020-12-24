@@ -1,13 +1,9 @@
 package com.github.aly8246.example.jdbc
 
-import com.github.aly8246.JdbcCatalogValidator.CATALOG_TYPE_VALUE_JDBC
-import com.github.aly8246.option.JdbcOption.JdbcOptionBuilder
-import com.github.aly8246.catalog.PhoenixJdbcCatalog
 import com.github.aly8246.example.EnvCreate
-import com.github.aly8246.option.JdbcOption
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api.bridge.scala._
-import org.apache.flink.table.catalog.Catalog
+import org.apache.flink.types.Row
 
 /**
  * 从数据库读取表数据
@@ -37,9 +33,14 @@ object CatalogApplication {
          | 'type'='jdbc-ex',
          | 'default-database'='test',
          | 'base-url'='jdbc:phoenix:hadoop1,hadoop2,hadoop3:2181/test'
-         |
          | )
          |""".stripMargin)
+    envTuple
+      ._2
+      .sqlQuery("select * from phoenix_catalog.`default`.dim_user")
+      .toAppendStream[Row]
+      .print()
+
     envTuple._1.execute()
   }
 }

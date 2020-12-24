@@ -1,7 +1,7 @@
 package com.github.aly8246.catalog;
 
+import com.github.aly8246.factory.JdbcDynamicTableFactory;
 import com.github.aly8246.option.JdbcOption;
-import org.apache.flink.connector.jdbc.table.JdbcDynamicTableFactory;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;

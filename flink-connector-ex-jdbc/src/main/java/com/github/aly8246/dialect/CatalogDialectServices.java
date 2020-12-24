@@ -4,6 +4,7 @@ import org.apache.flink.table.catalog.Catalog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 public class CatalogDialectServices {
@@ -25,5 +26,12 @@ public class CatalogDialectServices {
                 .filter(e -> e.supported(jdbcUrl))
                 .findFirst()
                 .orElseThrow(() -> new UnsupportedOperationException("数据库可能不支持catalog"));
+    }
+
+    public static Optional<CatalogDialect<? extends Catalog>> get(String url) {
+        return catalogDialectList
+                .stream()
+                .filter(e -> e.supported(url))
+                .findFirst();
     }
 }

@@ -35,7 +35,6 @@ public class BaseOption implements Serializable {
      * 假如你的配置里有多个包含password的选项，则需要自己来修正password
      * 在dynamicFactory中不被支持
      */
-    @Deprecated
     public BaseOption(DescriptorProperties descriptorProperties) {
         descriptorProperties.getOptionalBoolean(ASYNC_SUPPORT_KEY).ifPresent(this::setAsyncSupported);
         //source参数
@@ -58,7 +57,6 @@ public class BaseOption implements Serializable {
                 .findFirst()
                 .ifPresent(this::setPassword);
     }
-
 
 
     /**

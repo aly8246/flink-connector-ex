@@ -8,6 +8,7 @@ public class JdbcCatalogValidator extends CatalogDescriptorValidator {
     public static final String CATALOG_JDBC_USERNAME = "username";
     public static final String CATALOG_JDBC_PASSWORD = "password";
     public static final String CATALOG_JDBC_BASE_URL = "base-url";
+    public static final String CATALOG_JDBC_DRIVER = "driver";
 
     @Override
     public void validate(DescriptorProperties properties) {
